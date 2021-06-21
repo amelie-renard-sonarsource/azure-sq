@@ -15,7 +15,7 @@ jobs:
       extraProperties: "sonar.cfamily.build-wrapper-output=bw_output"
   - bash: |
       mkdir -p $HOME/.sonar
-      curl -sSLo $HOME/.sonar/build-wrapper-linux-x86.zip ${{variables.BUILD_WRAPPER_DOWNLOAD_URL}}
+      curl -sSLo $HOME/.sonar/build-wrapper-linux-x86.zip '<SONARQUBE_HOST>/static/cpp/build-wrapper-linux-x86.zip'
       unzip -o $HOME/.sonar/build-wrapper-linux-x86.zip -d $HOME/.sonar/
     displayName: Download and install build wrapper
   - bash: |
