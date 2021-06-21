@@ -3,21 +3,21 @@ jobs:
   displayName: Build for Linux\Autotools With SonarQube
   pool:
     vmImage: 'ubuntu-latest'
+  variables:
+    BUILD_WRAPPER_DOWNLOAD_URL: <SONARQUBE_HOST>/static/cpp/build-wrapper-linux-x86.zip
   steps:
   # Make Build Wrapper available
-  - task: Bash@3
-    displayName: Download Build Wrapper
-    inputs:
-      targetType: inline
-      script: >
-        curl  '<SONARQUBE_HOST>/static/cpp/build-wrapper-linux-x86.zip' --output build-wrapper.zip
-        unzip build-wrapper.zip
   - task: SonarQubePrepare@4
     inputs:
-      SonarQube: 'azure-sq'
+      SonarQube: 'azure-sq' # Name of the SonarQube service endpoint you created
       scannerMode: 'CLI'
       configMode: 'file'
       extraProperties: "sonar.cfamily.build-wrapper-output=bw_output"
+  - bash: |
+      mkdir -p $HOME/.sonar
+      curl -sSLo $HOME/.sonar/build-wrapper-linux-x86.zip ${{variables.BUILD_WRAPPER_DOWNLOAD_URL}}
+      unzip -o $HOME/.sonar/build-wrapper-linux-x86.zip -d $HOME/.sonar/
+    displayName: Download and install build wrapper
   - bash: |
       mkdir build
       cmake -S . -B build
