@@ -1,17 +1,17 @@
 jobs:
-- job: BuildLinuxWithSonarCloud
-  displayName: Build for Linux\CMake With SonarCloud
+- job: BuildLinuxWithSonarQube
+  displayName: Build for Linux\CMake With SonarQube
   pool:
     vmImage: 'ubuntu-latest'
   variables:
-    BUILD_WRAPPER_DOWNLOAD_URL: https://sonarcloud.io/static/cpp/build-wrapper-linux-x86.zip
+    BUILD_WRAPPER_DOWNLOAD_URL: '<SONARQUBE_HOST>/static/cpp/build-wrapper-linux-x86.zip'
   steps:
-  - task: SonarCloudPrepare@1
+  - task: SonarQubePrepare@4
     inputs:
-      SonarCloud: 'SonarCloud' # Name of the SonarCloud service connection you created
-      organization: 'sc-sq-c-family-examples'
+      SonarQube: 'azure-sq'
       scannerMode: 'CLI'
       configMode: 'file'
+      extraProperties: "sonar.cfamily.build-wrapper-output=bw_output"
   - bash: |
       mkdir -p $HOME/.sonar
       curl -sSLo $HOME/.sonar/build-wrapper-linux-x86.zip ${{variables.BUILD_WRAPPER_DOWNLOAD_URL}}
@@ -23,7 +23,7 @@ jobs:
       export PATH=$HOME/.sonar/build-wrapper-linux-x86:$PATH
       autoreconf --install
       ./configure
-      build-wrapper-linux-x86-64 --out-dir build_wrapper_output_directory make clean all
+      build-wrapper-linux-x86-64 --out-dir bw_output make clean all
     workingDirectory: .
     displayName: Build in build-wrapper
-  - task: SonarCloudAnalyze@1
+  - task: SonarQubeAnalyze@4
