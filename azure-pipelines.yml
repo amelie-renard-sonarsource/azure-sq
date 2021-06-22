@@ -4,7 +4,7 @@ jobs:
   pool:
     vmImage: 'windows-latest'
   variables:
-    SONARQUBE_HOST_URL: http://f0348431025e.ngrok.io # Replace <SONARQUBE_HOST_URL> with your SonarQube server URL
+    SONARQUBE_HOST_URL: http://f0348431025e.ngrok.io
   steps:
   # Make Build Wrapper available
   - task: SonarQubePrepare@4
