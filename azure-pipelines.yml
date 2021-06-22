@@ -1,25 +1,27 @@
 jobs:
-- job: BuildWindowsWithSonarQube
-  displayName: Build for Windows\MSBuild With SonarQube
+- job: BuildMacOSWithSonarCloud
+  displayName: Build for MacOS\CMake With SonarCloud
   pool:
-    vmImage: 'windows-latest'
+    vmImage: 'macos-latest'
   variables:
     SONARQUBE_HOST_URL: http://f0348431025e.ngrok.io
   steps:
-  # Make Build Wrapper available
   - task: SonarQubePrepare@4
     inputs:
-      SonarQube: 'azure-sq' # Name of the SonarQube service endpoint you created
+      SonarQube: 'SonarQube' # Name of the SonarQube service endpoint you created
       scannerMode: 'CLI'
       configMode: 'file'
       extraProperties: "sonar.cfamily.build-wrapper-output=build_wrapper_output_directory"
-  - pwsh: |
-      curl --create-dirs -sSLo $HOME\.sonar\build-wrapper-win-x86.zip ${{variables.SONARQUBE_HOST_URL}}/static/cpp/build-wrapper-win-x86.zip
-      unzip -o $HOME\.sonar\build-wrapper-win-x86.zip -d $HOME\.sonar\
+  - bash: |
+      mkdir -p $HOME/.sonar
+      curl -sSLo $HOME/.sonar/build-wrapper-macosx-x86.zip ${{variables.SONARQUBE_HOST_URL}}/static/cpp/build-wrapper-macosx-x86.zip
+      unzip -o $HOME/.sonar/build-wrapper-macosx-x86.zip -d $HOME/.sonar/
     displayName: Download and install build wrapper
-  - pwsh: |
-      $path = vswhere -latest -requires Microsoft.Component.MSBuild -find MSBuild\**\Bin\MSBuild.exe | select-object -first 1
-      & "$HOME\.sonar\build-wrapper-win-x86\build-wrapper-win-x86-64.exe" --out-dir build_wrapper_output_directory $path sonar_scanner_example.vcxproj /t:rebuild
+  - bash: |
+      mkdir build
+      cmake -S . -B build
+      export PATH=$HOME/.sonar/build-wrapper-macosx-x86:$PATH
+      build-wrapper-macosx-x86 --out-dir build_wrapper_output_directory cmake --build build/ --config Release
     workingDirectory: .
     displayName: Build in build-wrapper
   - task: SonarQubeAnalyze@4
