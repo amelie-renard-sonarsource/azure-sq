@@ -11,17 +11,15 @@ jobs:
       scannerMode: 'CLI'
       configMode: 'file'
       extraProperties: "sonar.cfamily.build-wrapper-output=build_wrapper_output_directory"
-  - bash: |
-      mkdir -p $HOME/.sonar
+  - pwsh: |
       # Replace xxx with yyy
-      curl -sSLo $HOME/.sonar/build-wrapper-linux-x86.zip 'http://f0348431025e.ngrok.io/static/cpp/build-wrapper-linux-x86.zip'
-      unzip -o $HOME/.sonar/build-wrapper-linux-x86.zip -d $HOME/.sonar/
+      curl --create-dirs -sSLo $HOME\.sonar\build-wrapper-win-x86.zip 'http://f0348431025e.ngrok.io/static/cpp/build-wrapper-linux-x86.zip'
+      unzip -o $HOME\.sonar\build-wrapper-win-x86.zip -d $HOME\.sonar\
     displayName: Download and install build wrapper
-  - bash: |
-      mkdir build
+  - pwsh: |
+      New-Item -ItemType directory -Path build
       cmake -S . -B build
-      export PATH=$HOME/.sonar/build-wrapper-linux-x86:$PATH
-      build-wrapper-linux-x86-64 --out-dir build_wrapper_output_directory cmake --build build/ --config Release
+      & "$HOME\.sonar\build-wrapper-win-x86\build-wrapper-win-x86-64.exe" --out-dir build_wrapper_output_directory cmake --build build\ --config Release
     workingDirectory: .
     displayName: Build in build-wrapper
   - task: SonarQubeAnalyze@4
