@@ -1,6 +1,6 @@
 jobs:
 - job: BuildMacOSWithSonarQube
-  displayName: Build for MacOS\CMake With SonarQube
+  displayName: Build for MacOS\XCode With SonarQube
   pool:
     vmImage: 'macos-latest'
   variables:
@@ -18,10 +18,8 @@ jobs:
       unzip -o $HOME/.sonar/build-wrapper-macosx-x86.zip -d $HOME/.sonar/
     displayName: Download and install build wrapper
   - bash: |
-      mkdir build
-      cmake -S . -B build
       export PATH=$HOME/.sonar/build-wrapper-macosx-x86:$PATH
-      build-wrapper-macosx-x86 --out-dir build_wrapper_output_directory cmake --build build/ --config Release
+      build-wrapper-macosx-x86 --out-dir build_wrapper_output_directory xcodebuild
     workingDirectory: .
     displayName: Build in build-wrapper
   - task: SonarQubeAnalyze@4
