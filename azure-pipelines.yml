@@ -1,8 +1,8 @@
 jobs:
-- job: BuildLinuxWithSonarQube
-  displayName: Build for Linux\Autotools With SonarQube
+- job: BuildWindowsWithSonarQube
+  displayName: Build for Windows\CMake With SonarQube
   pool:
-    vmImage: 'ubuntu-latest'
+    vmImage: 'windows-latest'
   steps:
   # Make Build Wrapper available
   - task: SonarQubePrepare@4
@@ -10,7 +10,7 @@ jobs:
       SonarQube: 'azure-sq' # Name of the SonarQube service endpoint you created
       scannerMode: 'CLI'
       configMode: 'file'
-      extraProperties: "sonar.cfamily.build-wrapper-output=bw_output"
+      extraProperties: "sonar.cfamily.build-wrapper-output=build_wrapper_output_directory"
   - bash: |
       mkdir -p $HOME/.sonar
       # Replace xxx with yyy
@@ -21,7 +21,7 @@ jobs:
       mkdir build
       cmake -S . -B build
       export PATH=$HOME/.sonar/build-wrapper-linux-x86:$PATH
-      build-wrapper-linux-x86-64 --out-dir bw_output cmake --build build/ --config Release
+      build-wrapper-linux-x86-64 --out-dir build_wrapper_output_directory cmake --build build/ --config Release
     workingDirectory: .
     displayName: Build in build-wrapper
   - task: SonarQubeAnalyze@4
