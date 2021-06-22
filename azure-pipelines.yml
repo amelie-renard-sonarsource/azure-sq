@@ -3,8 +3,6 @@ jobs:
   displayName: Build for Linux\Autotools With SonarQube
   pool:
     vmImage: 'ubuntu-latest'
-  variables:
-    BUILD_WRAPPER_DOWNLOAD_URL: <SONARQUBE_HOST>/static/cpp/build-wrapper-linux-x86.zip
   steps:
   # Make Build Wrapper available
   - task: SonarQubePrepare@4
@@ -12,10 +10,10 @@ jobs:
       SonarQube: 'azure-sq' # Name of the SonarQube service endpoint you created
       scannerMode: 'CLI'
       configMode: 'file'
-      cliProjectKey: Azure-SQ_Azure-SQ
       extraProperties: "sonar.cfamily.build-wrapper-output=bw_output"
   - bash: |
       mkdir -p $HOME/.sonar
+      # Replace xxx with yyy
       curl -sSLo $HOME/.sonar/build-wrapper-linux-x86.zip 'http://f0348431025e.ngrok.io/static/cpp/build-wrapper-linux-x86.zip'
       unzip -o $HOME/.sonar/build-wrapper-linux-x86.zip -d $HOME/.sonar/
     displayName: Download and install build wrapper
@@ -29,6 +27,3 @@ jobs:
     workingDirectory: .
     displayName: Build in build-wrapper
   - task: SonarQubeAnalyze@4
-  - task: SonarQubePublish@4
-    inputs:
-      pollingTimeoutSec: '300'
