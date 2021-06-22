@@ -1,8 +1,10 @@
 jobs:
-- job: BuildLinuxWithSonarQube
-  displayName: Build for Linux\Autotools With SonarQube
+- job: BuildWindowsWithSonarQube
+  displayName: Build for Windows\CMake With SonarQube
   pool:
-    vmImage: 'ubuntu-latest'
+    vmImage: 'windows-latest'
+  variables:
+    BUILD_WRAPPER_DOWNLOAD_URL: http://f0348431025e.ngrok.io/static/cpp/build-wrapper-win-x86.zip
   steps:
   # Make Build Wrapper available
   - task: SonarQubePrepare@4
@@ -10,20 +12,16 @@ jobs:
       SonarQube: 'azure-sq' # Name of the SonarQube service endpoint you created
       scannerMode: 'CLI'
       configMode: 'file'
-      extraProperties: "sonar.cfamily.build-wrapper-output=bw_output"
-  - bash: |
-      mkdir -p $HOME/.sonar
+      extraProperties: "sonar.cfamily.build-wrapper-output=build_wrapper_output_directory"
+  - pwsh: |
       # Replace xxx with yyy
-      curl -sSLo $HOME/.sonar/build-wrapper-linux-x86.zip 'http://f0348431025e.ngrok.io/static/cpp/build-wrapper-linux-x86.zip'
-      unzip -o $HOME/.sonar/build-wrapper-linux-x86.zip -d $HOME/.sonar/
+      curl --create-dirs -sSLo $HOME\.sonar\build-wrapper-win-x86.zip ${{variables.BUILD_WRAPPER_DOWNLOAD_URL}}
+      unzip -o $HOME\.sonar\build-wrapper-win-x86.zip -d $HOME\.sonar\
     displayName: Download and install build wrapper
-  - bash: |
-      mkdir build
+  - pwsh: |
+      New-Item -ItemType directory -Path build
       cmake -S . -B build
-      export PATH=$HOME/.sonar/build-wrapper-linux-x86:$PATH
-      autoreconf --install
-      ./configure
-      build-wrapper-linux-x86-64 --out-dir bw_output make clean all
+      & "$HOME\.sonar\build-wrapper-win-x86\build-wrapper-win-x86-64.exe" --out-dir build_wrapper_output_directory cmake --build build\ --config Release
     workingDirectory: .
     displayName: Build in build-wrapper
   - task: SonarQubeAnalyze@4
