@@ -1,6 +1,6 @@
 jobs:
-- job: BuildMacOSWithSonarCloud
-  displayName: Build for MacOS\CMake With SonarCloud
+- job: BuildMacOSWithSonarQube
+  displayName: Build for MacOS\CMake With SonarQube
   pool:
     vmImage: 'macos-latest'
   variables:
@@ -8,7 +8,7 @@ jobs:
   steps:
   - task: SonarQubePrepare@4
     inputs:
-      SonarQube: 'SonarQube' # Name of the SonarQube service endpoint you created
+      SonarQube: 'azure-sq' # Name of the SonarQube service endpoint you created
       scannerMode: 'CLI'
       configMode: 'file'
       extraProperties: "sonar.cfamily.build-wrapper-output=build_wrapper_output_directory"
