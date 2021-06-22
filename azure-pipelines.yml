@@ -12,6 +12,7 @@ jobs:
       SonarQube: 'azure-sq' # Name of the SonarQube service endpoint you created
       scannerMode: 'CLI'
       configMode: 'file'
+      cliProjectKey: Azure-SQ_Azure-SQ
       extraProperties: "sonar.cfamily.build-wrapper-output=bw_output"
   - bash: |
       mkdir -p $HOME/.sonar
@@ -28,3 +29,6 @@ jobs:
     workingDirectory: .
     displayName: Build in build-wrapper
   - task: SonarQubeAnalyze@4
+  - task: SonarQubePublish@4
+    inputs:
+      pollingTimeoutSec: '300'
